@@ -160,7 +160,7 @@ end)
 
 local originalMaterials = {}
 local fpsBoosterEnabled = false
-library:create_toggle("FPS Booster - Beta", "Misc", function(toggled)
+library:create_toggle("Universal FPS Boost - Beta", "Misc", function(toggled)
     fpsBoosterEnabled = toggled
     if toggled then
         game.Lighting.GlobalShadows = false
