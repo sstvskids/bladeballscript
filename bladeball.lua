@@ -169,7 +169,7 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
         task.spawn(function()
             while fpsBoosterEnabled do
                 local descendants = game:GetDescendants()
-                local batchSize = 500
+                local batchSize = 250
                 for i = 1, #descendants, batchSize do
                     local batch = {unpack(descendants, i, math.min(i + batchSize - 1, #descendants))}
                     for _, descendant in ipairs(batch) do
