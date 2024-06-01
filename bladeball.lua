@@ -191,7 +191,7 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
                             descendant.BlastRadius = 1
                         end
                     end
-                    task.defer(function() end) -- Yield to prevent lag spike
+                    task.wait(0.2) -- Yield to prevent lag spike
                 end
                 local lightingDescendants = game.Lighting:GetDescendants()
                 for _, effect in pairs(lightingDescendants) do
