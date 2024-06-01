@@ -165,10 +165,11 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
     if toggled then
         game.Lighting.GlobalShadows = false
         setfpscap(9e9)
+
         task.spawn(function()
             while fpsBoosterEnabled do
                 local descendants = game:GetDescendants()
-                local batchSize = 100
+                local batchSize = 500
                 for i = 1, #descendants, batchSize do
                     local batch = {unpack(descendants, i, math.min(i + batchSize - 1, #descendants))}
                     for _, descendant in ipairs(batch) do
@@ -190,7 +191,7 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
                             descendant.BlastRadius = 1
                         end
                     end
-                    task.wait(0.1) -- Yield to prevent lag spike
+                    task.wait(0.01) -- Yield to prevent lag spike
                 end
                 local lightingDescendants = game.Lighting:GetDescendants()
                 for _, effect in pairs(lightingDescendants) do
