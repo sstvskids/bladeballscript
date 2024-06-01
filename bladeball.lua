@@ -166,10 +166,12 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
 
         for _, descendant in pairs(game:GetDescendants()) do
             if descendant:IsA("Part") or descendant:IsA("UnionOperation") or descendant:IsA("MeshPart") or descendant:IsA("CornerWedgePart") or descendant:IsA("TrussPart") then
-                originalMaterials[descendant] = {
-                    Material = descendant.Material,
-                    Reflectance = descendant.Reflectance
-                }
+                if not originalMaterials[descendant] then
+                    originalMaterials[descendant] = {
+                        Material = descendant.Material,
+                        Reflectance = descendant.Reflectance
+                    }
+                end
                 descendant.Material = Enum.Material.Plastic
                 descendant.Reflectance = 0
             elseif descendant:IsA("Decal") then
@@ -189,8 +191,10 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
         end
     else
         for part, originalData in pairs(originalMaterials) do
-            part.Material = originalData.Material
-            part.Reflectance = originalData.Reflectance
+            if part:IsA("Part") or part:IsA("UnionOperation") or part:IsA("MeshPart") or part:IsA("CornerWedgePart") or part:IsA("TrussPart") then
+                part.Material = originalData.Material
+                part.Reflectance = originalData.Reflectance
+            end
         end
         game.Lighting.GlobalShadows = true
         setfpscap(60)
