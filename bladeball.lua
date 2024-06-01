@@ -1,3 +1,6 @@
+--// moreunc intergration for better exploiting experience
+loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-MoreUNC-13110", true))()
+
 --// nurysium recode
 
 local version = '0.3'
