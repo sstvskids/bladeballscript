@@ -607,4 +607,5 @@ end)
 
 
 initializate('nurysium_temp')
+task.wait(2)
 loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-MoreUNC-13110", true))()
