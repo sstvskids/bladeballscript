@@ -621,7 +621,7 @@ task.spawn(function()
 		end)
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
-		    local randomOffset = Vector3.new(math.random(-100, 100), math.random(0, 100), math.random(-100, 100)) * 0.01
+		    local randomOffset = Vector3.new(math.random(-500, 500), math.random(0, 500), math.random(-500, 500)) * 0.001
 		    local preciseTargetPosition = target_Position + randomOffset
 		    parry_remote:FireServer(
 		        0,
@@ -630,11 +630,12 @@ task.spawn(function()
 		        {target_Position.X, target_Position.Y},
 		        false
 		    )
+		
 		    aura.can_parry = false
 		    aura.hit_Time = tick()
 		    aura.hit_Count = aura.hit_Count + 1
 		
-		    task.delay(0.2, function()
+		    task.delay(0.05, function()
 		        aura.hit_Count = aura.hit_Count - 1
 		    end)
 		end
