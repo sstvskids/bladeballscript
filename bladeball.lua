@@ -159,36 +159,42 @@ library:create_toggle("FPS Unlocker", "Misc", function(toggled)
 end)
 
 local originalMaterials = {}
+local fpsBoosterEnabled = false
 library:create_toggle("FPS Booster", "Misc", function(toggled)
+    fpsBoosterEnabled = toggled
     if toggled then
         game.Lighting.GlobalShadows = false
         setfpscap(9e9)
-
-        for _, descendant in pairs(game:GetDescendants()) do
-            if descendant:IsA("Part") or descendant:IsA("UnionOperation") or descendant:IsA("MeshPart") or descendant:IsA("CornerWedgePart") or descendant:IsA("TrussPart") then
-                if not originalMaterials[descendant] then
-                    originalMaterials[descendant] = {
-                        Material = descendant.Material,
-                        Reflectance = descendant.Reflectance
-                    }
+			
+        task.spawn(function()
+            while fpsBoosterEnabled do
+                for _, descendant in pairs(game:GetDescendants()) do
+                    if descendant:IsA("Part") or descendant:IsA("UnionOperation") or descendant:IsA("MeshPart") or descendant:IsA("CornerWedgePart") or descendant:IsA("TrussPart") then
+                        if not originalMaterials[descendant] then
+                            originalMaterials[descendant] = {
+                                Material = descendant.Material,
+                                Reflectance = descendant.Reflectance
+                            }
+                        end
+                        descendant.Material = Enum.Material.Plastic
+                        descendant.Reflectance = 0
+                    elseif descendant:IsA("Decal") then
+                        descendant.Transparency = 1
+                    elseif descendant:IsA("ParticleEmitter") or descendant:IsA("Trail") then
+                        descendant.Lifetime = NumberRange.new(0)
+                    elseif descendant:IsA("Explosion") then
+                        descendant.BlastPressure = 1
+                        descendant.BlastRadius = 1
+                    end
                 end
-                descendant.Material = Enum.Material.Plastic
-                descendant.Reflectance = 0
-            elseif descendant:IsA("Decal") then
-                descendant.Transparency = 1
-            elseif descendant:IsA("ParticleEmitter") or descendant:IsA("Trail") then
-                descendant.Lifetime = NumberRange.new(0)
-            elseif descendant:IsA("Explosion") then
-                descendant.BlastPressure = 1
-                descendant.BlastRadius = 1
+                for _, effect in pairs(game.Lighting:GetDescendants()) do
+                    if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
+                        effect.Enabled = false
+                    end
+                end
+                task.wait(2.5)
             end
-        end
-
-        for _, effect in pairs(game.Lighting:GetDescendants()) do
-            if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
-                effect.Enabled = false
-            end
-        end
+        end)
     else
         for part, originalData in pairs(originalMaterials) do
             if part:IsA("Part") or part:IsA("UnionOperation") or part:IsA("MeshPart") or part:IsA("CornerWedgePart") or part:IsA("TrussPart") then
@@ -196,6 +202,7 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
                 part.Reflectance = originalData.Reflectance
             end
         end
+        originalMaterials = {}
         game.Lighting.GlobalShadows = true
         setfpscap(60)
     end
