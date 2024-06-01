@@ -520,8 +520,10 @@ task.spawn(function()
 		            if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then
 		                local targetPosition = closest_Entity.HumanoidRootPart.Position
 		                local lookVector = closest_Entity.HumanoidRootPart.CFrame.LookVector
-		                local hitPosition = targetPosition + lookVector * (aura.spam_Range / 2)
-		                local pingFactor = 0.001 + (0.0001 * (ping or 0))
+		                local hitPosition = targetPosition + lookVector * aura.spam_Range
+		
+		                -- Calculate ping-based delay
+		                local pingFactor = 0.001 + (0.0001 * (ping or 2))
 		                local delayInSeconds = ping / 1000 * pingFactor
 		
 		                task.delay(delayInSeconds, function()
