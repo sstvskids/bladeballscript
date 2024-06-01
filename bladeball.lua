@@ -160,16 +160,17 @@ end)
 
 local originalMaterials = {}
 local fpsBoosterEnabled = false
-library:create_toggle("FPS Booster", "Misc", function(toggled)
+library:create_toggle("FPS Booster - Beta", "Misc", function(toggled)
     fpsBoosterEnabled = toggled
     if toggled then
         game.Lighting.GlobalShadows = false
         setfpscap(9e9)
-
         task.spawn(function()
             while fpsBoosterEnabled do
                 local descendants = game:GetDescendants()
-                local batchSize = 250
+                local lightingDescendants = game.Lighting:GetDescendants()
+                local batchSize = 100
+                -- Process game descendants in batches
                 for i = 1, #descendants, batchSize do
                     local batch = {unpack(descendants, i, math.min(i + batchSize - 1, #descendants))}
                     for _, descendant in ipairs(batch) do
@@ -191,12 +192,15 @@ library:create_toggle("FPS Booster", "Misc", function(toggled)
                             descendant.BlastRadius = 1
                         end
                     end
-                    task.wait(0.2) -- Yield to prevent lag spike
+                    task.defer(function() end) -- Yield to prevent lag spike
                 end
-                local lightingDescendants = game.Lighting:GetDescendants()
-                for _, effect in pairs(lightingDescendants) do
-                    if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
-                        effect.Enabled = false
+                -- Process lighting descendants in batches
+                for i = 1, #lightingDescendants, batchSize do
+                    local batch = {unpack(lightingDescendants, i, math.min(i + batchSize - 1, #lightingDescendants))}
+                    for _, effect in ipairs(batch) do
+                        if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
+                            effect.Enabled = false
+                        end
                     end
                     task.defer(function() end) -- Yield to prevent lag spike
                 end
