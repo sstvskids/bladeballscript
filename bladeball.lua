@@ -515,22 +515,27 @@ task.spawn(function()
 		end
 
 		if closest_Entity then
-			if workspace.Alive:FindFirstChild(closest_Entity.Name) then
-				if aura.is_spamming then
-					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then
-					    local targetPosition = closest_Entity.HumanoidRootPart.Position
-					    local lookVector = closest_Entity.HumanoidRootPart.CFrame.LookVector
-					    local hitPosition = targetPosition + lookVector * 0.5
-					    parry_remote:FireServer(
-					        0,
-					        CFrame.new(camera.CFrame.Position, targetPosition),
-					        {[closest_Entity.Name] = hitPosition},
-					        {targetPosition.X, targetPosition.Y},
-					        false
-					    )
-					end
-				end
-			end
+		    if workspace.Alive:FindFirstChild(closest_Entity.Name) then
+		        if aura.is_spamming then
+		            if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then
+		                local targetPosition = closest_Entity.HumanoidRootPart.Position
+		                local lookVector = closest_Entity.HumanoidRootPart.CFrame.LookVector
+		                local hitPosition = targetPosition + lookVector * (aura.spam_Range / 2)
+		                local pingFactor = 0.001 + (0.0001 * (ping or 0))
+		                local delayInSeconds = ping / 1000 * pingFactor
+		
+		                task.delay(delayInSeconds, function()
+		                    parry_remote:FireServer(
+		                        0,
+		                        CFrame.new(camera.CFrame.Position, targetPosition),
+		                        {[closest_Entity.Name] = hitPosition},
+		                        {hitPosition.X, hitPosition.Y}, -- Use the updated hit position
+		                        false
+		                    )
+		                end)
+		            end
+		        end
+		    end
 		end
 	end)
 
@@ -621,21 +626,26 @@ task.spawn(function()
 		end)
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
-		    local randomOffset = Vector3.new(math.random(-500, 500), math.random(0, 500), math.random(-500, 500)) * 0.001
+		    local pingFactor = 0.0001 + (0.00001 * (ping or 0))
+		    local randomOffset = Vector3.new(math.random(-1000, 1000), math.random(0, 1000), math.random(-1000, 1000)) * pingFactor
 		    local preciseTargetPosition = target_Position + randomOffset
-		    parry_remote:FireServer(
-		        0,
-		        CFrame.new(camera.CFrame.Position, preciseTargetPosition),
-		        {[closest_Entity.Name] = preciseTargetPosition},
-		        {target_Position.X, target_Position.Y},
-		        false
-		    )
+		    local delayInSeconds = ping / 1000
+		
+		    task.delay(delayInSeconds, function()
+		        parry_remote:FireServer(
+		            0,
+		            CFrame.new(camera.CFrame.Position, preciseTargetPosition),
+		            {[closest_Entity.Name] = preciseTargetPosition},
+		            {preciseTargetPosition.X, preciseTargetPosition.Y},
+		            false
+		        )
+		    end)
 		
 		    aura.can_parry = false
 		    aura.hit_Time = tick()
 		    aura.hit_Count = aura.hit_Count + 1
 		
-		    task.delay(0.05, function()
+		    task.delay(0.2, function()
 		        aura.hit_Count = aura.hit_Count - 1
 		    end)
 		end
