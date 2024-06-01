@@ -464,7 +464,7 @@ task.defer(function()
             end
 
             if aura.is_spamming then
-                resolved_Position = player_Position + (ball_Position - player_Position).Unit * 10
+                resolved_Position = player_Position + (ball_Position - player_Position).Unit * 12
             end
 
             walk_to(resolved_Position + Vector3.new(math.sin(tick()) * 10, 0, math.cos(tick()) * 10))
@@ -476,7 +476,7 @@ end)
 ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function()
 	aura.hit_Count += 1
 
-	task.delay(0.185, function()
+	task.delay(0.005, function()
 		aura.hit_Count -= 1
 	end)
 end)
@@ -564,7 +564,7 @@ task.spawn(function()
 		local target_isMoving = target_Velocity.Magnitude > 0
 		local target_Dot = target_isMoving and math.max(target_Direction:Dot(target_Velocity.Unit), 0)
 
-		aura.spam_Range = math.max(ping / 10, 10.5) + ball_Speed / 6.15
+		aura.spam_Range = math.max(ping / 12, 12.5) + ball_Speed / 6.15
 		aura.parry_Range = math.max(math.max(ping, 3.5) + ball_Speed / 3.25, 9.5)
 
 		if target_isMoving then
