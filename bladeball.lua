@@ -222,19 +222,22 @@ end)
 
 local player = game.Players.LocalPlayer
 local userInputService = game:GetService("UserInputService")
+local jumpRequestConnection = nil
 library:create_toggle("Infinite Jump", "Misc", function(toggled)
     if toggled then
         local character = player.Character
         if character then
             local humanoid = character:FindFirstChildOfClass("Humanoid")
             if humanoid then
-                userInputService.JumpRequest:Connect(function()
+                jumpRequestConnection = userInputService.JumpRequest:Connect(function()
                     humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
                 end)
             end
         end
     else
-        userInputService.JumpRequest:Disconnect()
+        if jumpRequestConnection then
+            jumpRequestConnection:Disconnect()
+        end
     end
 end)
 
