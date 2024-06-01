@@ -1,6 +1,6 @@
 --// nurysium recode
 
-local version = '0.3.0'
+local version = '0.3'
 
 print('nurysium llc. - https://dsc.gg/nurysium')
 print(version)
