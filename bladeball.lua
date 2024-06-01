@@ -220,6 +220,24 @@ library:create_toggle("Universal FPS Boost - Beta", "Misc", function(toggled)
     end
 end)
 
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+library:create_toggle("Infinite Jump", "Misc", function(toggled)
+    if toggled then
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                userInputService.JumpRequest:Connect(function()
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end)
+            end
+        end
+    else
+        userInputService.JumpRequest:Disconnect()
+    end
+end)
+
 library:create_toggle("Discord Invite", "Misc", function(toggle)
 	setclipboard("https://discord.gg/q93X9YuvBD")
 	toclipboard("https://discord.gg/q93X9YuvBD")
