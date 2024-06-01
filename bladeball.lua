@@ -192,7 +192,7 @@ library:create_toggle("Universal FPS Boost - Beta", "Misc", function(toggled)
                             descendant.BlastRadius = 1
                         end
                     end
-                    task.defer(function() end) -- Yield to prevent lag spike
+                    task.wait(0.1) -- Yield to prevent lag spike
                 end
                 -- Process lighting descendants in batches
                 for i = 1, #lightingDescendants, batchSize do
@@ -202,7 +202,7 @@ library:create_toggle("Universal FPS Boost - Beta", "Misc", function(toggled)
                             effect.Enabled = false
                         end
                     end
-                    task.defer(function() end) -- Yield to prevent lag spike
+                    task.wait(0.1) -- Yield to prevent lag spike
                 end
                 task.wait(2.5)
             end
