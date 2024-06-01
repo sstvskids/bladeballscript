@@ -517,14 +517,17 @@ task.spawn(function()
 		if closest_Entity then
 			if workspace.Alive:FindFirstChild(closest_Entity.Name) then
 				if aura.is_spamming then
-					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then   
-						parry_remote:FireServer(
-							0.5,
-							CFrame.new(camera.CFrame.Position, Vector3.zero),
-							{[closest_Entity.Name] = closest_Entity.HumanoidRootPart.Position},
-							{closest_Entity.HumanoidRootPart.Position.X, closest_Entity.HumanoidRootPart.Position.Y},
-							false
-						)
+					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then
+					    local targetPosition = closest_Entity.HumanoidRootPart.Position
+					    local lookVector = closest_Entity.HumanoidRootPart.CFrame.LookVector
+					    local hitPosition = targetPosition + lookVector * 0.5
+					    parry_remote:FireServer(
+					        0,
+					        CFrame.new(camera.CFrame.Position, targetPosition),
+					        {[closest_Entity.Name] = hitPosition},
+					        {targetPosition.X, targetPosition.Y},
+					        false
+					    )
 					end
 				end
 			end
@@ -618,21 +621,22 @@ task.spawn(function()
 		end)
 
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
-			parry_remote:FireServer(
-				0,
-				CFrame.new(camera.CFrame.Position, Vector3.new(math.random(-1000, 1000), math.random(0, 1000), math.random(100, 1000))),
-				{[closest_Entity.Name] = target_Position},
-				{target_Position.X, target_Position.Y},
-				false
-			)
-
-			aura.can_parry = false
-			aura.hit_Time = tick()
-			aura.hit_Count += 1
-
-			task.delay(0.2, function()
-				aura.hit_Count -= 1
-			end)
+		    local randomOffset = Vector3.new(math.random(-100, 100), math.random(0, 100), math.random(-100, 100)) * 0.01
+		    local preciseTargetPosition = target_Position + randomOffset
+		    parry_remote:FireServer(
+		        0,
+		        CFrame.new(camera.CFrame.Position, preciseTargetPosition),
+		        {[closest_Entity.Name] = preciseTargetPosition},
+		        {target_Position.X, target_Position.Y},
+		        false
+		    )
+		    aura.can_parry = false
+		    aura.hit_Time = tick()
+		    aura.hit_Count = aura.hit_Count + 1
+		
+		    task.delay(0.2, function()
+		        aura.hit_Count = aura.hit_Count - 1
+		    end)
 		end
 
 		task.spawn(function()
