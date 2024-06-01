@@ -519,7 +519,7 @@ task.spawn(function()
 				if aura.is_spamming then
 					if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then   
 						parry_remote:FireServer(
-							0,
+							0.5,
 							CFrame.new(camera.CFrame.Position, Vector3.zero),
 							{[closest_Entity.Name] = closest_Entity.HumanoidRootPart.Position},
 							{closest_Entity.HumanoidRootPart.Position.X, closest_Entity.HumanoidRootPart.Position.Y},
