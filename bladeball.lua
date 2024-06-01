@@ -158,32 +158,43 @@ library:create_toggle("FPS Unlocker", "Misc", function(toggled)
 	end
 end)
 
+local originalMaterials = {}
 library:create_toggle("FPS Booster", "Misc", function(toggled)
-	if toggled then
-		game.Lighting.GlobalShadows = false
-		setfpscap(9e9)
-        for i,v in pairs(game:GetDescendants()) do
-            if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
-                v.Material = Enum.Material.Plastic
-                v.Reflectance = 0
-            elseif v:IsA("Decal") then
-                v.Transparency = 1
-            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-                v.Lifetime = NumberRange.new(0)
-            elseif v:IsA("Explosion") then
-                v.BlastPressure = 1
-                v.BlastRadius = 1
+    if toggled then
+        game.Lighting.GlobalShadows = false
+        setfpscap(9e9)
+
+        for _, descendant in pairs(game:GetDescendants()) do
+            if descendant:IsA("Part") or descendant:IsA("UnionOperation") or descendant:IsA("MeshPart") or descendant:IsA("CornerWedgePart") or descendant:IsA("TrussPart") then
+                originalMaterials[descendant] = {
+                    Material = descendant.Material,
+                    Reflectance = descendant.Reflectance
+                }
+                descendant.Material = Enum.Material.Plastic
+                descendant.Reflectance = 0
+            elseif descendant:IsA("Decal") then
+                descendant.Transparency = 1
+            elseif descendant:IsA("ParticleEmitter") or descendant:IsA("Trail") then
+                descendant.Lifetime = NumberRange.new(0)
+            elseif descendant:IsA("Explosion") then
+                descendant.BlastPressure = 1
+                descendant.BlastRadius = 1
             end
         end
-        for i,v in pairs(game.Lighting:GetDescendants()) do
-            if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
-                v.Enabled = false
+
+        for _, effect in pairs(game.Lighting:GetDescendants()) do
+            if effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
+                effect.Enabled = false
             end
         end
-	else
-		game.Lighting.GlobalShadows = true
-		setfpscap(60)
-	end
+    else
+        for part, originalData in pairs(originalMaterials) do
+            part.Material = originalData.Material
+            part.Reflectance = originalData.Reflectance
+        end
+        game.Lighting.GlobalShadows = true
+        setfpscap(60)
+    end
 end)
 
 library:create_toggle("Discord Invite", "Misc", function(toggle)
