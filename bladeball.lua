@@ -514,12 +514,12 @@ task.spawn(function()
 		if not getgenv().aura_Enabled then
 			return
 		end
-		local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 		local ping = game.Players.LocalPlayer:GetNetworkPing()
 
 		if closest_Entity and workspace.Alive:FindFirstChild(closest_Entity.Name) and aura.is_spamming then
 		    local targetPosition = closest_Entity.HumanoidRootPart.Position
 		    local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
+		    local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 		    local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
 		    
 		    local pingFactor = 0.001 + (0.0001 * ping)
@@ -550,7 +550,6 @@ task.spawn(function()
 		if not getgenv().aura_Enabled then
 			return
 		end
-		local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 
 		workspace:WaitForChild("Balls").ChildRemoved:Once(function(child)
 			aura.hit_Count = 0
@@ -640,6 +639,7 @@ task.spawn(function()
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
 		    local targetPosition = closest_Entity.HumanoidRootPart.Position
 		    local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
+		    local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 		    local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
 		    local pingFactor = 0.0001 + (0.00001 * (ping or 1))
 		    local velocityFactor = 0.1 + (0.01 * (targetVelocity.Magnitude or 1))
