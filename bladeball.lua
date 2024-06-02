@@ -602,13 +602,13 @@ task.spawn(function()
 		local target_Velocity = closest_Entity.HumanoidRootPart.AssemblyLinearVelocity
 		local target_isMoving = target_Velocity.Magnitude > 0
 		local target_Dot = target_isMoving and (target_Direction:Dot(target_Velocity.Unit) >= 0 and target_Direction:Dot(target_Velocity.Unit) or 0)
-		local pingAdjustment = (latency / 12 >= 12.5 and latency / 12 or 12.5)
-		local parryPingAdjustment = (latency >= 3.5 and latency or 3.5)
-		local maxPing = 1000
-		local defaultParryRange = 8.55
+		local pingAdjustment = (ping / 12 >= 12.5 and ping / 12 or 12.5)
+		local parryPingAdjustment = (ping >= 3.5 and ping or 3.5)
+		local ballSpeedAdjustmentSpam = ball_Speed ~= 0 and ball_Speed / 6.15 or 0
+		local ballSpeedAdjustmentParry = ball_Speed ~= 0 and ball_Speed / 3.25 or 0
 		
-		aura.spam_Range = pingAdjustment + ball_Speed / 6.15
-		aura.parry_Range = ((parryPingAdjustment + ball_Speed / 3.25) <= maxPing and (parryPingAdjustment + ball_Speed / 3.25) or defaultParryRange)
+		aura.spam_Range = pingAdjustment + ballSpeedAdjustmentSpam
+		aura.parry_Range = ((parryPingAdjustment + ballSpeedAdjustmentParry) >= 9.5 and (parryPingAdjustment + ballSpeedAdjustmentParry) or 9.5)
 
 		if target_isMoving then
 		    aura.is_spamming = aura.hit_Count > 1 or (target_Distance < 10 and ball_Distance < 10 and ball_Dot > -0.25)
