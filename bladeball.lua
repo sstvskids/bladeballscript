@@ -515,6 +515,7 @@ task.spawn(function()
 			return
 		end
 		local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
+		local ping = game.Players.LocalPlayer:GetNetworkPing()
 
 		if closest_Entity and workspace.Alive:FindFirstChild(closest_Entity.Name) and aura.is_spamming then
 		    local targetPosition = closest_Entity.HumanoidRootPart.Position
@@ -549,6 +550,7 @@ task.spawn(function()
 		if not getgenv().aura_Enabled then
 			return
 		end
+		local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 
 		workspace:WaitForChild("Balls").ChildRemoved:Once(function(child)
 			aura.hit_Count = 0
