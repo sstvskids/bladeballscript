@@ -38,7 +38,7 @@ local Services = {
 	game:GetService('SocialService')
 }
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_ui.lua"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/sstvskids/bladeballscript/main/bbui.lua"))()
 task.wait(0.5)
 
 --// Yes, you can rename, I don't mind 🌠
