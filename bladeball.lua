@@ -558,7 +558,7 @@ task.spawn(function()
 			aura.last_target = nil
 		end)
 
-		local ping = game:GetService("NetworkClient"):GetPing()
+		local ping = game.Players.LocalPlayer:GetNetworkPing()
 		local self = Nurysium_Util.getBall()
 
 		if not self then
