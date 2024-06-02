@@ -384,20 +384,38 @@ end)
 --// shaders
 
 task.defer(function()
-	while task.wait(1) do
-		if getgenv().shaders_effect_Enabled then
-			TweenService:Create(game:GetService("Lighting").Bloom, TweenInfo.new(4), {
-				Size = 100,
-				Intensity = 2.1
-			}):Play()
-			game.Lighting.GlobalShadows = true
-		else
-			TweenService:Create(game:GetService("Lighting").Bloom, TweenInfo.new(3), {
-				Size = 3,
-				Intensity = 1
-			}):Play()
-		end
-	end
+    while task.wait(1) do
+        if getgenv().shaders_effect_Enabled then
+            TweenService:Create(game:GetService("Lighting").Bloom, TweenInfo.new(4), {
+                Size = 150,
+                Intensity = 2.5
+            }):Play()
+            TweenService:Create(game:GetService("Lighting").ColorCorrection, TweenInfo.new(4), {
+                Saturation = 0.3,
+                Contrast = 0.2,
+                Brightness = 0.1
+            }):Play()
+            TweenService:Create(game:GetService("Lighting").DepthOfField, TweenInfo.new(4), {
+                FocusDistance = 30,
+                InFocusRadius = 15,
+                NearIntensity = 0.7,
+                FarIntensity = 0.7
+            }):Play()
+            game.Lighting.GlobalShadows = true
+            game.Lighting.Ambient = Color3.fromRGB(100, 100, 100)
+            game.Lighting.OutdoorAmbient = Color3.fromRGB(80, 80, 80)
+			game:GetService("Lighting").Bloom.Enabled = true
+            game:GetService("Lighting").ColorCorrection.Enabled = true
+            game:GetService("Lighting").DepthOfField.Enabled = true
+        else
+            game.Lighting.GlobalShadows = false
+            game.Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+            game.Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+            game:GetService("Lighting").Bloom.Enabled = false
+            game:GetService("Lighting").ColorCorrection.Enabled = false
+            game:GetService("Lighting").DepthOfField.Enabled = false
+        end
+    end
 end)
 
 ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
@@ -519,7 +537,7 @@ task.spawn(function()
 		if closest_Entity and workspace.Alive:FindFirstChild(closest_Entity.Name) and aura.is_spamming then
 		    local targetPosition = closest_Entity.HumanoidRootPart.Position
 		    local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
-		    local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
+			local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 		    local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
 		    
 		    local pingFactor = 0.001 + (0.0001 * ping)
@@ -639,7 +657,7 @@ task.spawn(function()
 		if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
 		    local targetPosition = closest_Entity.HumanoidRootPart.Position
 		    local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
-		    local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
+			local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
 		    local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
 		    local pingFactor = 0.0001 + (0.00001 * (ping or 1))
 		    local velocityFactor = 0.1 + (0.01 * (targetVelocity.Magnitude or 1))
