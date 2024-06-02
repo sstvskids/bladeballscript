@@ -145,12 +145,13 @@ function nurysium: init(name: string, is_draggable: boolean, parent)
 	uiVisible.TextWrapped = true
 
 	task.defer(function()
-	      while task.wait(0.1) do
+	    while task.wait(0.1) do
 	        uiVisible.Visible = true
-	      if is_Mobile then
-	        uiVisible.Visible = is_Mobile
-	      end
-	  end)
+	        if is_Mobile then
+	            uiVisible.Visible = is_Mobile
+	        end
+	    end
+	end)
 
 	UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(16, 18, 24)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(21, 24, 33))}
 	UIGradient.Rotation = -88
