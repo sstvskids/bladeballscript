@@ -490,7 +490,8 @@ task.defer(function()
             end
 
             if aura.is_spamming then
-                resolved_Position = player_Position + (ball_Position - player_Position).Unit * 12
+		directionToBall = (ball_Position - player_Position).Unit
+		resolved_Position = player_Position + directionToBall * 10.5
             end
 
             walk_to(resolved_Position + Vector3.new(math.sin(tick()) * 10, 0, math.cos(tick()) * 10))
