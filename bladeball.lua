@@ -39,7 +39,7 @@ local Services = {
 }
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/flezzpe/Nurysium/main/nurysium_ui.lua"))()
-task.wait(0.5)
+task.wait(0.25)
 
 --// Yes, you can rename, I don't mind 🌠
 library:init("Nurysium " ..version, game:GetService("UserInputService").TouchEnabled, game:GetService("CoreGui"))
