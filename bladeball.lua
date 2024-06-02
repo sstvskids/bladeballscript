@@ -515,32 +515,33 @@ task.spawn(function()
 			return
 		end
 
-		if closest_Entity then
-		    if workspace.Alive:FindFirstChild(closest_Entity.Name) then
-		        if aura.is_spamming then
-		            if local_player:DistanceFromCharacter(closest_Entity.HumanoidRootPart.Position) <= aura.spam_Range then
-		                local targetPosition = closest_Entity.HumanoidRootPart.Position
-		                local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
-		                local predictionTime = ping / 1000
-		                local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
-		                local pingFactor = 0.001 + (0.0001 * (ping or 1))
-		                local velocityFactor = 0.1 + (0.01 * (targetVelocity.Magnitude or 1))
-		                local randomOffset = Vector3.new(math.random(-1000, 1000), math.random(-1000, 1000), math.random(-1000, 1000)) * (pingFactor + velocityFactor)
-		                local preciseHitPosition = predictedTargetPosition + randomOffset
-		                local delayInSeconds = ping / 1000
+		if closest_Entity and workspace.Alive:FindFirstChild(closest_Entity.Name) and aura.is_spamming then
+		    local targetPosition = closest_Entity.HumanoidRootPart.Position
+		    local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
+		    local predictionTime = ping / 1000
+		    local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
+		    
+		    local pingFactor = 0.001 + (0.0001 * ping)
+		    local velocityFactor = 0.1 + (0.01 * targetVelocity.Magnitude)
+		    local randomOffsetMultiplier = pingFactor + velocityFactor
+		    local randomOffset = Vector3.new(
+		        math.random(-1000, 1000),
+		        math.random(-1000, 1000),
+		        math.random(-1000, 1000)
+		    ) * randomOffsetMultiplier
+		    
+		    local preciseHitPosition = predictedTargetPosition + randomOffset
+		    local delayInSeconds = ping / 1000
 		
-		                task.delay(delayInSeconds, function()
-		                    parry_remote:FireServer(
-		                        0,
-		                        CFrame.new(camera.CFrame.Position, targetPosition),
-		                        {[closest_Entity.Name] = preciseHitPosition},
-		                        {preciseHitPosition.X, preciseHitPosition.Y}, -- Use the updated hit position
-		                        false
-		                    )
-		                end)
-		            end
-		        end
-		    end
+		    task.delay(delayInSeconds, function()
+		        parry_remote:FireServer(
+		            0,
+		            CFrame.new(camera.CFrame.Position, targetPosition),
+		            {[closest_Entity.Name] = preciseHitPosition},
+		            {preciseHitPosition.X, preciseHitPosition.Y},
+		            false
+		        )
+		    end)
 		end
 	end)
 
