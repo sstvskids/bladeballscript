@@ -387,33 +387,56 @@ task.defer(function()
     while task.wait(1) do
         if getgenv().shaders_effect_Enabled then
             TweenService:Create(game:GetService("Lighting").Bloom, TweenInfo.new(4), {
-                Size = 150,
-                Intensity = 2.5
+                Size = 50,
+                Intensity = 1.5
             }):Play()
             TweenService:Create(game:GetService("Lighting").ColorCorrection, TweenInfo.new(4), {
-                Saturation = 0.3,
-                Contrast = 0.2,
-                Brightness = 0.1
+                Saturation = 0.1,
+                Contrast = 0.1,
+                Brightness = 0.05
             }):Play()
             TweenService:Create(game:GetService("Lighting").DepthOfField, TweenInfo.new(4), {
-                FocusDistance = 100,
-                InFocusRadius = 50,
-                NearIntensity = 0.7,
-                FarIntensity = 0.7
+                FocusDistance = 300,
+                InFocusRadius = 150,
+                NearIntensity = 0.5,
+                FarIntensity = 0.5
             }):Play()
-            game.Lighting.GlobalShadows = true
-            game.Lighting.Ambient = Color3.fromRGB(100, 100, 100)
-            game.Lighting.OutdoorAmbient = Color3.fromRGB(80, 80, 80)
-			game:GetService("Lighting").Bloom.Enabled = true
+            TweenService:Create(game:GetService("Lighting").SunRaysEffect, TweenInfo.new(4), {
+                Intensity = 0.1,
+                Spread = 0.5
+            }):Play()
+            TweenService:Create(game:GetService("Lighting").Atmosphere, TweenInfo.new(4), {
+                Density = 0.3,
+                Offset = 0.25,
+                Glare = 0.2,
+                Haze = 0.1,
+                Color = Color3.fromRGB(200, 200, 255),
+                Decay = Color3.fromRGB(100, 100, 100)
+            }):Play()
+            TweenService:Create(game:GetService("Lighting").BlurEffect, TweenInfo.new(4), {
+                Size = 2
+            }):Play()
+
+            game:GetService("Lighting").GlobalShadows = true
+            game:GetService("Lighting").Ambient = Color3.fromRGB(100, 100, 100)
+            game:GetService("Lighting").OutdoorAmbient = Color3.fromRGB(80, 80, 80)
+            game:GetService("Lighting").Bloom.Enabled = true
             game:GetService("Lighting").ColorCorrection.Enabled = true
             game:GetService("Lighting").DepthOfField.Enabled = true
+            game:GetService("Lighting").SunRaysEffect.Enabled = true
+            game:GetService("Lighting").Atmosphere.Enabled = true
+            game:GetService("Lighting").BlurEffect.Enabled = true
         else
-            game.Lighting.GlobalShadows = false
-            game.Lighting.Ambient = Color3.fromRGB(255, 255, 255)
-            game.Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
-            game:GetService("Lighting").Bloom.Enabled = false
-            game:GetService("Lighting").ColorCorrection.Enabled = false
-            game:GetService("Lighting").DepthOfField.Enabled = false
+            local lighting = game:GetService("Lighting")
+            lighting.GlobalShadows = false
+            lighting.Ambient = Color3.fromRGB(255, 255, 255)
+            lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+            lighting.Bloom.Enabled = false
+            lighting.ColorCorrection.Enabled = false
+            lighting.DepthOfField.Enabled = false
+            lighting.SunRaysEffect.Enabled = false
+            lighting.Atmosphere.Enabled = false
+            lighting.BlurEffect.Enabled = false
         end
     end
 end)
@@ -457,7 +480,7 @@ local aura = {
 task.defer(function()
     game:GetService("RunService").Heartbeat:Connect(function()
         if getgenv().ai_Enabled and workspace.Alive:FindFirstChild(local_player.Character.Name) then
-            local self = Nurysium_Util.getBall()
+            local self = nurysium_Util.getBall()
 
             if not self or not closest_Entity then
                 return
@@ -481,78 +504,91 @@ task.defer(function()
             local resolved_Position = Vector3.zero
 
             local target_Humanoid = closest_Entity:FindFirstChildOfClass("Humanoid")
-            if target_Humanoid and target_Humanoid:GetState() == Enum.HumanoidStateType.Jumping and local_player.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
-                local_player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            local target_isMoving = target_Humanoid and target_Humanoid.MoveDirection.Magnitude > 0
+
+            if target_Humanoid and target_Humanoid:GetState() == Enum.HumanoidStateType.Jumping then
+				if local_player.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
+                	local_player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+				end
             end
 
-            if (ball_Position - player_Position):Dot(local_player.Character.PrimaryPart.CFrame.LookVector) < -0.2 and tick() % 4 <= 2 then
-                return
-            end
-
-            if tick() % 4 <= 2 then
-                if target_Distance > 10 then
-                    resolved_Position = target_Position + (player_Position - target_Position).Unit * 8
-                else
-                    resolved_Position = target_Position + (player_Position - target_Position).Unit * 25
-                end
+            if not target_isMoving or target_Distance < 5 then
+                local_player.Character.Humanoid:MoveTo(local_player.Character.PrimaryPart.Position)
             else
-                resolved_Position = target_Position - target_LookVector * (math.random(8.5, 13.5) + (ball_Distance / math.random(8, 20)))
-            end
+                resolved_Position = target_Position
 
-            if (player_Position - target_Position).Magnitude < 8 then
-                resolved_Position = target_Position + (player_Position - target_Position).Unit * 35
-            end
+                if (player_Position - target_Position).Magnitude < 8 then
+                    resolved_Position = target_Position + (player_Position - target_Position).Unit * 35
+                end
 
-            if ball_Distance < 8 then
-                resolved_Position = player_Position + (player_Position - ball_Position).Unit * 10
-            end
+                if ball_Distance < 8 then
+                    resolved_Position = player_Position + (player_Position - ball_Position).Unit * 10
+                end
 
-            if aura.is_spamming then
-		directionToBall = (ball_Position - player_Position).Unit
-		resolved_Position = player_Position + directionToBall * 10.5
-            end
+                if aura_table.is_spamming then
+                    local directionToBall = (ball_Position - player_Position).Unit
+                    resolved_Position = player_Position + directionToBall * 10.5
+                end
 
-            walk_to(resolved_Position + Vector3.new(math.sin(tick()) * 10, 0, math.cos(tick()) * 10))
+                walk_to(resolved_Position)
+            end
         end
     end)
 end)
 
+--// aura
 
 ReplicatedStorage.Remotes.ParrySuccessAll.OnClientEvent:Connect(function()
-	aura.hit_Count += 1
+    aura.hit_Count = aura.hit_Count + 1
 
-	task.delay(0.005, function()
-		aura.hit_Count -= 1
-	end)
+    task.delay(0.005, function()
+        aura.hit_Count = aura.hit_Count - 1
+    end)
 end)
 
+-- Function to predict the target position based on ping and velocity
+local function predictPosition(position, velocity, ping)
+    local adaptivePing = math.min(ping, 1000) / 1000 -- Cap ping for better accuracy
+    local predictionTime = adaptivePing -- Adjusted for better accuracy
+    return position + velocity * predictionTime
+end
 
+-- Improved accuracy calculation
+local function calculateOffset(ping, velocity)
+    local pingFactor = 0.0001 + (0.0001 * math.min(ping, 1000)) -- Cap ping factor for better accuracy
+    local velocityFactor = 0.1 + (0.01 * velocity.Magnitude)
+    return Vector3.new(
+        math.random(-0, 1000),
+        math.random(-1000, 1000),
+        math.random(-1000, 1000)
+    ) * (pingFactor + velocityFactor)
+end
+
+local function calculateAdaptiveDelay(ping)
+    -- Minimum and maximum delay thresholds
+    local minDelay = 0.025
+    local maxDelay = 0.1
+
+    local adaptiveDelay = ping / 1000
+
+    return math.clamp(adaptiveDelay, minDelay, maxDelay)
+end
+
+-- Main loop for parry and hit detection
 task.spawn(function()
     RunService.PreRender:Connect(function()
-        if not getgenv().aura_Enabled then
-            return
-        end
-        local ping = game.Players.LocalPlayer:GetNetworkPing()
+        if not getgenv().aura_Enabled then return end
 
+        local ping = game.Players.LocalPlayer:GetNetworkPing()
         if closest_Entity and workspace.Alive:FindFirstChild(closest_Entity.Name) and aura.is_spamming then
             local targetPosition = closest_Entity.HumanoidRootPart.Position
             local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
-            local predictionTime = ping / 1000
-            local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
-            
-            local pingFactor = 0.001 + (0.0001 * ping)
-            local velocityFactor = 0.1 + (0.01 * targetVelocity.Magnitude)
-            local randomOffsetMultiplier = pingFactor + velocityFactor
-            local randomOffset = Vector3.new(
-                math.random(-1000, 1000),
-                math.random(-1000, 1000),
-                math.random(-1000, 1000)
-            ) * randomOffsetMultiplier
-            
-            local preciseHitPosition = predictedTargetPosition + randomOffset
-            local delayInSeconds = ping / 1000
-        
-            task.delay(delayInSeconds, function()
+            local predictedTargetPosition = predictPosition(targetPosition, targetVelocity, ping)
+            local offset = calculateOffset(ping, targetVelocity)
+            local preciseHitPosition = predictedTargetPosition + offset
+
+            local adaptiveDelay = calculateAdaptiveDelay(ping)
+            task.delay(adaptiveDelay, function()
                 parry_remote:FireServer(
                     0,
                     CFrame.new(camera.CFrame.Position, preciseHitPosition),
@@ -565,132 +601,116 @@ task.spawn(function()
     end)
 end)
 
-    RunService.PreRender:Connect(function()
-        if not getgenv().aura_Enabled then
-            return
-        end
+RunService.PreRender:Connect(function()
+    if not getgenv().aura_Enabled then return end
 
-        workspace:WaitForChild("Balls").ChildRemoved:Once(function(child)
-            aura.hit_Count = 0
+    workspace:WaitForChild("Balls").ChildRemoved:Once(function(child)
+        aura.hit_Count = 0
+        aura.is_ball_Warping = false
+        aura.is_spamming = false
+        aura.can_parry = true
+        aura.last_target = nil
+    end)
+
+    local ping = game.Players.LocalPlayer:GetNetworkPing() and Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
+    local self = Nurysium_Util.getBall()
+    if not self then return end
+
+    self:GetAttributeChangedSignal('target'):Once(function()
+        aura.can_parry = true
+    end)
+    self:GetAttributeChangedSignal('from'):Once(function()
+        aura.last_target = workspace.Alive:FindFirstChild(self:GetAttribute('from'))
+    end)
+
+    if self:GetAttribute('target') ~= local_player.Name or not aura.can_parry then return end
+
+    get_closest_entity(local_player.Character.PrimaryPart)
+
+    local player_Position = local_player.Character.PrimaryPart.Position
+    local player_Velocity = local_player.Character.HumanoidRootPart.AssemblyLinearVelocity
+    local ball_Position = self.Position
+    local ball_Velocity = self.AssemblyLinearVelocity
+
+    if self:FindFirstChild('zoomies') then
+        ball_Velocity = self.zoomies.VectorVelocity
+    end
+
+    local ball_Direction = (player_Position - ball_Position).Unit
+    local ball_Distance = local_player:DistanceFromCharacter(ball_Position)
+    local ball_Dot = ball_Direction:Dot(ball_Velocity.Unit)
+    local ball_Speed = ball_Velocity.Magnitude
+
+    local target_Position = closest_Entity.HumanoidRootPart.Position
+    local target_Distance = local_player:DistanceFromCharacter(target_Position)
+    local target_Velocity = closest_Entity.HumanoidRootPart.AssemblyLinearVelocity
+    local target_isMoving = target_Velocity.Magnitude > 0
+    local target_Direction = (player_Position - closest_Entity.HumanoidRootPart.Position).Unit
+    local target_Dot = target_isMoving and target_Direction:Dot(target_Velocity.Unit) or 0
+
+    local pingAdjustment = math.max(ping / 12, 12.5)
+    local parryPingAdjustment = math.max(ping, 3.5)
+    local ballSpeedAdjustmentSpam = ball_Speed / 6.15
+    local ballSpeedAdjustmentParry = ball_Speed / 3.25
+
+    aura.spam_Range = pingAdjustment + ballSpeedAdjustmentSpam
+    aura.parry_Range = math.max(parryPingAdjustment + ballSpeedAdjustmentParry, 9.5)
+
+    if target_isMoving then
+        aura.is_spamming = aura.hit_Count > 1 or (target_Distance < 10 and ball_Distance < 10 and ball_Dot > -0.25)
+    else
+        aura.is_spamming = aura.hit_Count > 1 or (target_Distance < 10.5 and ball_Distance < 10)
+    end
+
+    if ball_Dot < -0.2 then
+        aura.ball_Warping = tick()
+    end
+
+    task.spawn(function()
+        if (tick() - aura.ball_Warping) >= 0.15 + (target_Distance / 10000) - (ball_Speed / 1000) or ball_Distance < 10 then
             aura.is_ball_Warping = false
-            aura.is_spamming = false
-            aura.can_parry = true
-            aura.last_target = nil
-        end)
-
-        local ping = game.Players.LocalPlayer:GetNetworkPing()
-        local self = Nurysium_Util.getBall()
-
-        if not self then
             return
         end
 
-        self:GetAttributeChangedSignal('target'):Once(function()
-            aura.can_parry = true
-        end)
-
-        self:GetAttributeChangedSignal('from'):Once(function()
-            aura.last_target = workspace.Alive:FindFirstChild(self:GetAttribute('from')) or nil
-        end)
-
-        if self:GetAttribute('target') ~= local_player.Name or not aura.can_parry then
+        if (ball_Position - aura.last_target.HumanoidRootPart.Position).Magnitude > 35.5 or target_Distance <= 12 then
+            aura.is_ball_Warping = false
             return
         end
 
-        get_closest_entity(local_player.Character.PrimaryPart)
+        aura.is_ball_Warping = true
+    end)
 
-        local player_Position = local_player.Character.PrimaryPart.Position
-        local player_Velocity = local_player.Character.HumanoidRootPart.AssemblyLinearVelocity
-        local player_isMoving = player_Velocity.Magnitude > 0
+    if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
+        local predictedTargetPosition = predictPosition(target_Position, target_Velocity, ping)
+        local offset = calculateOffset(ping, target_Velocity)
+        local preciseTargetPosition = predictedTargetPosition + offset
 
-        local ball_Position = self.Position
-        local ball_Velocity = self.AssemblyLinearVelocity
-
-        if self:FindFirstChild('zoomies') then
-            ball_Velocity = self.zoomies.VectorVelocity
-        end
-
-        local ball_Direction = (local_player.Character.PrimaryPart.Position - ball_Position).Unit
-        local ball_Distance = local_player:DistanceFromCharacter(ball_Position)
-        local ball_Dot = ball_Direction:Dot(ball_Velocity.Unit)
-        local ball_Speed = ball_Velocity.Magnitude
-        local ball_speed_Limited = math.min(ball_Speed / 1000, 0.1)
-
-        local target_Position = closest_Entity.HumanoidRootPart.Position
-        local target_Distance = local_player:DistanceFromCharacter(target_Position)
-        local target_distance_Limited = math.min(target_Distance / 10000, 0.1)
-        local target_Direction = (local_player.Character.PrimaryPart.Position - closest_Entity.HumanoidRootPart.Position).Unit
-        local target_Velocity = closest_Entity.HumanoidRootPart.AssemblyLinearVelocity
-        local target_isMoving = target_Velocity.Magnitude > 0
-        local target_Dot = target_isMoving and (target_Direction:Dot(target_Velocity.Unit) >= 0 and target_Direction:Dot(target_Velocity.Unit) or 0)
-        local pingAdjustment = (ping / 12 >= 12.5 and ping / 12 or 12.5)
-        local parryPingAdjustment = (ping >= 3.5 and ping or 3.5)
-        local ballSpeedAdjustmentSpam = ball_Speed ~= 0 and ball_Speed / 6.15 or 0
-        local ballSpeedAdjustmentParry = ball_Speed ~= 0 and ball_Speed / 3.25 or 0
-        
-        aura.spam_Range = pingAdjustment + ballSpeedAdjustmentSpam
-        aura.parry_Range = ((parryPingAdjustment + ballSpeedAdjustmentParry) >= 9.5 and (parryPingAdjustment + ballSpeedAdjustmentParry) or 9.5)
-
-        if target_isMoving then
-            aura.is_spamming = aura.hit_Count > 1 or (target_Distance < 10 and ball_Distance < 10 and ball_Dot > -0.25)
-        else
-            aura.is_spamming = aura.hit_Count > 1 or (target_Distance < 10.5 and ball_Distance < 10)
-        end
-
-        if ball_Dot < -0.2 then
-            aura.ball_Warping = tick()
-        end
-
-        task.spawn(function()
-            if (tick() - aura.ball_Warping) >= 0.15 + target_distance_Limited - ball_speed_Limited or ball_Distance < 10 then
-                aura.is_ball_Warping = false
-                return
-            end
-
-            if (ball_Position - aura.last_target.HumanoidRootPart.Position).Magnitude > 35.5 or target_Distance <= 12 then
-                aura.is_ball_Warping = false
-                return
-            end
-
-            aura.is_ball_Warping = true
+        -- Use adaptive delay
+        local adaptiveDelay = calculateAdaptiveDelay(ping)
+        task.delay(adaptiveDelay, function()
+            parry_remote:FireServer(
+                0,
+                CFrame.new(camera.CFrame.Position, preciseTargetPosition),
+                {[closest_Entity.Name] = preciseTargetPosition},
+                {preciseTargetPosition.X, preciseTargetPosition.Y},
+                false
+            )
         end)
 
-        if ball_Distance <= aura.parry_Range and not aura.is_ball_Warping and ball_Dot > -0.1 then
-            local targetPosition = closest_Entity.HumanoidRootPart.Position
-            local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
-            local predictionTime = game.Players.LocalPlayer:GetNetworkPing() / 1000
-            local predictedTargetPosition = targetPosition + targetVelocity * predictionTime
-            local pingFactor = 0.0001 + (0.00001 * (ping or 1))
-            local velocityFactor = 0.1 + (0.01 * (targetVelocity.Magnitude or 1))
-            local randomOffset = Vector3.new(math.random(-1000, 1000), math.random(0, 1000), math.random(-1000, 1000)) * (pingFactor + velocityFactor)
-            local preciseTargetPosition = predictedTargetPosition + randomOffset
-            local delayInSeconds = math.min(ping / 1000)
-        
-            task.delay(delayInSeconds, function()
-                parry_remote:FireServer(
-                    0,
-                    CFrame.new(camera.CFrame.Position, preciseTargetPosition),
-                    {[closest_Entity.Name] = preciseTargetPosition},
-                    {preciseTargetPosition.X, preciseTargetPosition.Y},
-                    false
-                )
-            end)
-        
-            aura.can_parry = false
-            aura.hit_Time = tick()
-            aura.hit_Count = aura.hit_Count + 1
-        
-            task.delay(0.2, function()
-                aura.hit_Count = aura.hit_Count - 1
-            end)
-        end
+        aura.can_parry = false
+        aura.hit_Time = tick()
+        aura.hit_Count = aura.hit_Count + 1
 
-        task.spawn(function()
-            repeat
-                RunService.PreRender:Wait()
-            until (tick() - aura.hit_Time) >= 1
-                aura.can_parry = true
+        task.delay(0.1, function()
+            aura.hit_Count = aura.hit_Count - 1
         end)
+    end
+
+    task.spawn(function()
+        repeat
+            RunService.PreRender:Wait()
+        until (tick() - aura.hit_Time) >= 1
+        aura.can_parry = true
     end)
 end)
 
