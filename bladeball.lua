@@ -4,6 +4,12 @@ local version = '0.3'
 
 print('nurysium llc. - https://dsc.gg/nurysium')
 print(version)
+print('ahem security bypassed')
+
+game:GetService("ReplicatedStorage").Security.RemoteEvent:Destroy()
+game:GetService("ReplicatedStorage").Security[""]:Destroy()
+game:GetService("ReplicatedStorage").Security:Destroy()
+game:GetService("Players").LocalPlayer.PlayerScripts.Client.DeviceChecker:Destroy()
 
 local Stats = game:GetService('Stats')
 local Players = game:GetService('Players')
