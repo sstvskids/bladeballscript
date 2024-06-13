@@ -561,7 +561,7 @@ end
 
 -- Improved accuracy calculation
 local function calculateOffset(ping, velocity)
-    local pingFactor = 0.0001 + (0.0001 * math.min(ping, 1000)) -- Cap ping factor for better accuracy
+    local pingFactor = 0.0001 + (0.0001 * math.min(ping, 1000))
     local velocityFactor = 0.1 + (0.01 * velocity.Magnitude)
     return Vector3.new(
         math.random(-0, 1000),
@@ -571,7 +571,6 @@ local function calculateOffset(ping, velocity)
 end
 
 local function calculateAdaptiveDelay(ping)
-    -- Minimum and maximum delay thresholds
     local minDelay = 0.025
     local maxDelay = 0.1
 
@@ -596,7 +595,7 @@ task.spawn(function()
             local adaptiveDelay = calculateAdaptiveDelay(ping)
             task.delay(adaptiveDelay, function()
                 parry_remote:FireServer(
-                    0,
+                    0.5,
                     CFrame.new(camera.CFrame.Position, preciseHitPosition),
                     {[closest_Entity.Name] = preciseHitPosition},
                     {preciseHitPosition.X, preciseHitPosition.Y},
@@ -695,7 +694,7 @@ RunService.PreRender:Connect(function()
         local adaptiveDelay = calculateAdaptiveDelay(ping)
         task.delay(adaptiveDelay, function()
             parry_remote:FireServer(
-                0,
+                0.5,
                 CFrame.new(camera.CFrame.Position, preciseTargetPosition),
                 {[closest_Entity.Name] = preciseTargetPosition},
                 {preciseTargetPosition.X, preciseTargetPosition.Y},
