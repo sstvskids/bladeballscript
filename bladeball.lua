@@ -588,9 +588,9 @@ task.spawn(function()
         if closest_Entity and workspace.Alive:FindFirstChild(closest_Entity.Name) and aura.is_spamming then
             local targetPosition = closest_Entity.HumanoidRootPart.Position
             local targetVelocity = closest_Entity.HumanoidRootPart.Velocity
-            local predictedTargetPosition = predictPosition(targetPosition, targetVelocity, ping)
+            local predictedTargetPosition = predictPosition(targetPosition, targetVelocity, ping) * 1.25
             local offset = calculateOffset(ping, targetVelocity)
-            local preciseHitPosition = predictedTargetPosition + offset
+            local preciseHitPosition = predictedTargetPosition + offset * 0.25
 
             local adaptiveDelay = calculateAdaptiveDelay(ping)
             task.delay(adaptiveDelay, function()
@@ -617,7 +617,7 @@ RunService.PreRender:Connect(function()
         aura.last_target = nil
     end)
 
-    local ping = game.Players.LocalPlayer:GetNetworkPing() and Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
+    local ping = game.Players.LocalPlayer:GetNetworkPing() or Stats.Network.ServerStatsItem['Data Ping']:GetValue() / 10
     local self = Nurysium_Util.getBall()
     if not self then return end
 
